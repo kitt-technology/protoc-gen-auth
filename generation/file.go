@@ -41,6 +41,10 @@ func New(file *protogen.File) (f File)  {
                 // TODO use proto-gen-go functionality for field names
                 name := *field.Name
 
+                if !proto.HasExtension(field.Options, auth.E_FieldBehaviour) {
+                    continue
+                }
+
                 switch proto.GetExtension(field.Options, auth.E_FieldBehaviour) {
                 case auth.FieldBehaviour_ID:
                     resourceId := strings.ToUpper(string(name[0])) + name[1:]
