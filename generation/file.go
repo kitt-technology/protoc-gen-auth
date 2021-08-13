@@ -4,9 +4,10 @@ import (
     "bytes"
     "github.com/kitt-technology/protoc-gen-auth/auth"
     "google.golang.org/protobuf/compiler/protogen"
+    "google.golang.org/protobuf/types/descriptorpb"
     "google.golang.org/protobuf/proto"
-    "strings"
     "text/template"
+    "github.com/golang/protobuf/protoc-gen-go/generator"
 )
 
 const fileTpl = `
@@ -38,20 +39,17 @@ func New(file *protogen.File) (f File)  {
 
         for _, field := range msg.Field {
             if field.Options != nil {
-                // TODO use proto-gen-go functionality for field names
-                name := *field.Name
-
                 if !proto.HasExtension(field.Options, auth.E_FieldBehaviour) {
                     continue
                 }
 
                 switch proto.GetExtension(field.Options, auth.E_FieldBehaviour) {
                 case auth.FieldBehaviour_ID:
-                    resourceId := strings.ToUpper(string(name[0])) + name[1:]
+                    resourceId := goKey(field)
                     authMessage.ResourceId = &resourceId
                     break;
                 case auth.FieldBehaviour_IDS:
-                    resourceIds := strings.ToUpper(string(name[0])) + name[1:]
+                    resourceIds := goKey(field)
                     authMessage.ResourceIds = &resourceIds
                     break
                 }
@@ -87,4 +85,8 @@ func (f File) ToString() string {
        out += msg.Generate()
     }
     return out
+}
+
+func goKey(field *descriptorpb.FieldDescriptorProto) string {
+	return generator.CamelCase(*field.Name)
 }
