@@ -3,7 +3,7 @@ package auth;
 
 import "google/protobuf/descriptor.proto";
 
-option go_package = ".;auth";
+option go_package = "github.com/kitt-technology/protoc-gen-auth/auth;auth";
 
 extend google.protobuf.FieldOptions {
   FieldBehaviour field_behaviour = 1072;
